@@ -1,9 +1,29 @@
 import { CommandModule } from 'yargs';
+import * as fs from 'fs';
 import { SpeedLimitsManager } from '../../lib/speed-limits';
 
 const manager = new SpeedLimitsManager();
 
-export const speedCommand: CommandModule = {
+interface SpeedCommandArgv {
+  show?: boolean;
+  s?: boolean;
+  region?: string;
+  r?: string;
+  unlimited?: boolean;
+  u?: boolean;
+  limit?: number;
+  l?: number;
+  default?: boolean;
+  d?: boolean;
+  regions?: boolean;
+  export?: boolean;
+  e?: boolean;
+  import?: string;
+  i?: string;
+  [key: string]: unknown;
+}
+
+export const speedCommand: CommandModule<unknown, SpeedCommandArgv> = {
   command: 'speed',
   describe: 'Manage speed limits for Bosch eBike',
   builder: (yargs) =>
@@ -52,7 +72,7 @@ export const speedCommand: CommandModule = {
         describe: 'Import configuration from JSON file',
         type: 'string',
       }),
-  handler: async (argv) => {
+  handler: async (argv: SpeedCommandArgv): Promise<void> => {
     try {
       // Pokaż listę regionów
       if (argv.regions) {
@@ -85,7 +105,7 @@ export const speedCommand: CommandModule = {
       }
 
       // Ustaw custom limit
-      if (argv.limit) {
+      if (argv.limit !== undefined && argv.limit !== null) {
         const success = manager.setCustomLimit(argv.limit);
         if (!success) {
           process.exit(1);
@@ -93,7 +113,7 @@ export const speedCommand: CommandModule = {
       }
 
       // Przywróć domyślny
-      if (argv.default) {
+      if (argv['default']) {
         const success = manager.disableUnlimited();
         if (!success) {
           process.exit(1);
@@ -110,15 +130,24 @@ export const speedCommand: CommandModule = {
 
       // Importuj
       if (argv.import) {
-        const fs = require('fs').readFileSync(argv.import as string, 'utf-8');
-        const success = manager.import(fs);
+        const fileContent = fs.readFileSync(argv.import, 'utf-8');
+        const success = manager.import(fileContent);
         if (!success) {
           process.exit(1);
         }
       }
 
       // Pokaż obecną konfigurację
-      if (argv.show || (!argv.region && !argv.unlimited && !argv.limit && !argv.default && !argv.export && !argv.import && !argv.regions)) {
+      const showDefault =
+        !argv.region &&
+        !argv.unlimited &&
+        (argv.limit === undefined || argv.limit === null) &&
+        !argv['default'] &&
+        !argv.export &&
+        !argv.import &&
+        !argv.regions;
+
+      if (argv.show || showDefault) {
         manager.showCurrent();
       }
     } catch (error) {
