@@ -1,0 +1,71 @@
+{
+  "name": "bosch-config-tool",
+  "version": "1.0.0",
+  "description": "Bosch e-Bike Configuration Tool - Electron GUI and Node.js CLI for managing Bosch eBike configuration via USB",
+  "main": "dist/electron/main.js",
+  "type": "module",
+  "scripts": {
+    "dev": "electron .",
+    "build": "tsc && electron-builder",
+    "cli": "node dist/cli/index.js",
+    "test": "jest",
+    "lint": "eslint src/",
+    "electron-dev": "electron . --remote-debugging-port=5858"
+  },
+  "keywords": [
+    "bosch",
+    "ebike",
+    "configuration",
+    "usb",
+    "electron",
+    "cli"
+  ],
+  "author": "slawek20124-lang",
+  "license": "MIT",
+  "dependencies": {
+    "serialport": "^11.0.0",
+    "@serialport/parser-readline": "^11.0.0",
+    "yargs": "^17.7.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "electron": "^27.0.0",
+    "electron-builder": "^24.0.0",
+    "jest": "^29.0.0",
+    "@types/jest": "^29.0.0",
+    "eslint": "^8.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0"
+  },
+  "build": {
+    "appId": "com.bosch-config-tool",
+    "productName": "Bosch Config Tool",
+    "directories": {
+      "buildResources": "assets",
+      "output": "dist"
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ]
+    },
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ]
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  }
+}
