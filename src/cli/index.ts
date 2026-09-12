@@ -5,8 +5,10 @@ import { readCommand } from './commands/read';
 import { writeCommand } from './commands/write';
 import { exportCommand } from './commands/export';
 import { importCommand } from './commands/import';
+import { detectCommand } from './commands/detect';
 
 yargs(hideBin(process.argv))
+  .command('detect', 'Detect and test Bosch eBike USB connection', detectCommand)
   .command('read', 'Read configuration from device', readCommand)
   .command('write', 'Write configuration to device', writeCommand)
   .command('export', 'Export binary config to JSON', exportCommand)
