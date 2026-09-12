@@ -4,100 +4,93 @@ import { BoschProtocol } from '../../lib/bosch-protocol';
 
 export const detectCommand: CommandModule = {
   command: 'detect',
-  describe: 'Detect and test Bosch eBike USB connection',
+  describe: 'Detect Bosch devices connected via USB',
   builder: (yargs) =>
     yargs
-      .option('list', {
-        alias: 'l',
-        describe: 'List all USB devices',
+      .option('test', {
+        alias: 't',
+        describe: 'Test connection to found device',
         type: 'boolean',
         default: false,
       })
-      .option('test', {
-        alias: 't',
-        describe: 'Test connection to device',
-        type: 'string',
-        default: null,
-      })
-      .option('ping', {
-        alias: 'p',
-        describe: 'Send PING to Bosch device',
+      .option('debug', {
+        alias: 'd',
+        describe: 'Show all serial ports (debug mode)',
         type: 'boolean',
         default: false,
       }),
   handler: async (argv) => {
     try {
-      // Opcja 1: Lista wszystkich urządzeń
-      if (argv.list) {
-        console.log('\n🔍 Skanowanie portów USB...\n');
-        await USBDetector.listAllDevices();
+      if (argv.debug) {
+        // Pokaż wszystkie porty
+        await USBDetector.debugPorts();
         return;
       }
 
-      // Opcja 2: Testuj konkretny port
-      if (argv.test) {
-        console.log(`\n🔗 Testowanie połączenia na porcie: ${argv.test}\n`);
-        const connected = await USBDetector.testConnection(argv.test as string);
-        if (connected) {
-          console.log(`✅ Połączenie z portem ${argv.test} jest aktywne!`);
-        } else {
-          console.log(`❌ Nie udało się połączyć z portem ${argv.test}`);
-        }
-        return;
-      }
+      console.log('\n🔍 Szukam urządzeń Bosch Performance Line...\n');
 
-      // Opcja 3: Testuj PING na znalezionym urządzeniu Bosch
-      if (argv.ping) {
-        console.log('\n📡 Szukanie urządzenia Bosch i wysyłanie PING...\n');
-        const device = await USBDetector.findBoschDevice();
-        
-        if (!device) {
-          console.error('❌ Brak urządzenia Bosch');
-          process.exit(1);
-        }
+      // Szukaj urządzenia Bosch
+      const boschDevice = await USBDetector.findBoschDevice();
 
-        const protocol = new BoschProtocol(device.port);
-        const connected = await protocol.connect();
-
-        if (!connected) {
-          console.error('❌ Nie udało się połączyć z urządzeniem');
-          process.exit(1);
-        }
-
-        const pingSuccess = await protocol.ping();
-        await protocol.disconnect();
-
-        if (pingSuccess) {
-          console.log('\n✅ PING udany! Urządzenie Bosch odpowiada.');
-        } else {
-          console.log('\n❌ PING nieudany - urządzenie nie odpowiada.');
-        }
-        return;
-      }
-
-      // Domyślnie: Szukaj i wyświetl pierwsze znalezione urządzenie Bosch
-      console.log('\n🔍 Szukanie urządzenia Bosch Performance Line...\n');
-      const device = await USBDetector.findBoschDevice();
-
-      if (device) {
-        console.log('\n📋 Szczegóły urządzenia:');
-        console.log(`   Port: ${device.port}`);
-        console.log(`   Producent: ${device.manufacturer}`);
-        console.log(`   Numer seryjny: ${device.serialNumber}`);
-        console.log(`   Vendor ID: ${device.vendorId}`);
-        console.log(`   Product ID: ${device.productId}`);
-        console.log('\n💡 Użyj: npm run cli detect --test <port> aby testować połączenie');
-        console.log('💡 Lub: npm run cli detect --ping aby wysłać PING');
-      } else {
-        console.log('\n❌ Urządzenie Bosch nie znalezione!');
-        console.log('\n💡 Spróbuj:');
-        console.log('   1. Upewnij się, że rower jest podłączony przez USB-C');
-        console.log('   2. Sprawdź sterowniki USB');
-        console.log('   3. Uruchom: npm run cli detect --list');
+      if (!boschDevice) {
+        console.log('\n❌ Nie znaleziono urządzenia Bosch!');
+        console.log('\n📝 Wskazówki:');
+        console.log('  1. Sprawdź czy rower jest podłączony przez USB-C');
+        console.log('  2. Sprawdź sterowniki USB');
+        console.log('  3. Spróbuj inny kabel USB');
+        console.log('  4. Uruchom z --debug aby zobaczyć wszystkie porty\n');
         process.exit(1);
       }
+
+      // Wyświetl informacje
+      console.log('\n✅ === ZNALEZIONE URZĄDZENIE ===\n');
+      console.log(`📍 Port: ${boschDevice.port}`);
+      console.log(`🏭 Producent: ${boschDevice.manufacturer}`);
+      console.log(`📱 VID: ${boschDevice.vendorId}`);
+      console.log(`📱 PID: ${boschDevice.productId}`);
+      console.log(`🔢 Serial: ${boschDevice.serialNumber}\n`);
+
+      // Test połączenia
+      if (argv.test) {
+        console.log('🧪 Testuję połączenie...\n');
+
+        const protocol = new BoschProtocol(boschDevice.port);
+        const connected = await protocol.connect();
+
+        if (connected) {
+          console.log('\n✅ Połączenie udane!');
+
+          // Spróbuj ping
+          const pong = await protocol.ping();
+          if (pong) {
+            console.log('✅ Ping: OK');
+          } else {
+            console.log('⚠️ Ping: Brak odpowiedzi (może być normalne)');
+          }
+
+          // Spróbuj odczytać status
+          const status = await protocol.readStatus();
+          if (status) {
+            console.log('\n📊 Status urządzenia:');
+            console.log(`  🔋 Bateria: ${status.battery}%`);
+            console.log(`  ⚡ Moc silnika: ${status.motorPower}W`);
+            console.log(`  🚴 Prędkość: ${status.speed} km/h`);
+            console.log(`  📏 Dystans: ${status.distance} km`);
+            console.log(`  🌡️ Temperatura: ${status.temperature}°C`);
+            console.log(`  🎯 Tryb: ${status.mode}\n`);
+          }
+
+          await protocol.disconnect();
+        } else {
+          console.log('\n❌ Nie udało się połączyć!');
+          console.log('⚠️ Urządzenie może wymagać specjalnego oprogramowania firmware\n');
+        }
+      } else {
+        console.log('💡 Wskazówka: Użyj --test aby przetestować połączenie');
+        console.log('Przykład: npm run cli detect --test\n');
+      }
     } catch (error) {
-      console.error(`❌ Błąd: ${error}`);
+      console.error(`\n❌ Błąd: ${error}\n`);
       process.exit(1);
     }
   },

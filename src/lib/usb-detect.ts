@@ -1,143 +1,151 @@
 import { SerialPort } from 'serialport';
 
 /**
- * USB Device Detection for Bosch eBike
- * Detekcja urządzeń USB-C podłączonych do komputera
+ * USB Device Detection
+ * Wykrywa urządzenia Bosch podłączone przez USB-C
  */
 
 export interface DetectedDevice {
   port: string;
   manufacturer: string;
-  serialNumber: string;
   productId: string;
   vendorId: string;
+  serialNumber: string;
   isBosch: boolean;
+  description: string;
 }
 
 export class USBDetector {
-  // Bosch Performance Line USB identifiers
-  private static readonly BOSCH_VENDORS = ['0x00E0', '0x0E0E']; // Bosch vendor IDs
-  private static readonly BOSCH_PRODUCTS = ['0x0001', '0x0002', '0x0003']; // Example product IDs
+  // Bosch Performance Line - USB VID/PID
+  private static readonly BOSCH_VENDOR_ID = '0x0590';
+  private static readonly BOSCH_PRODUCT_IDS = [
+    '0x0028', // Bosch Performance Line CX
+    '0x0029', // Bosch Performance Line Speed
+    '0x002A', // Bosch Active Line
+  ];
 
   /**
-   * Skanuj wszystkie dostępne porty seryjne
+   * Listuj wszystkie dostępne porty szeregowe
    */
-  static async scanPorts(): Promise<DetectedDevice[]> {
+  static async listAvailablePorts(): Promise<DetectedDevice[]> {
     try {
       const ports = await SerialPort.list();
-      const devices: DetectedDevice[] = [];
-
-      for (const port of ports) {
-        const device: DetectedDevice = {
+      
+      const detectedDevices: DetectedDevice[] = ports.map((port) => {
+        const isBosch = this.isBoschDevice(port);
+        
+        return {
           port: port.path,
           manufacturer: port.manufacturer || 'Unknown',
-          serialNumber: port.serialNumber || 'N/A',
-          productId: port.productId || 'N/A',
-          vendorId: port.vendorId || 'N/A',
-          isBosch: this.isBoschDevice(port),
+          productId: port.productId || 'Unknown',
+          vendorId: port.vendorId || 'Unknown',
+          serialNumber: port.serialNumber || 'Unknown',
+          isBosch,
+          description: isBosch
+            ? `✅ Bosch Performance Line - ${port.manufacturer}`
+            : `❌ ${port.manufacturer || 'Unknown Device'}`,
         };
-        devices.push(device);
-      }
+      });
 
-      return devices;
+      return detectedDevices;
     } catch (error) {
-      console.error(`❌ Błąd skanowania portów: ${error}`);
+      console.error(`❌ Błąd podczas listy portów: ${error}`);
       return [];
     }
   }
 
   /**
-   * Sprawdź czy urządzenie to Bosch
+   * Znajdź urządzenie Bosch
+   */
+  static async findBoschDevice(): Promise<DetectedDevice | null> {
+    const devices = await this.listAvailablePorts();
+    const boschDevice = devices.find((d) => d.isBosch);
+    
+    if (boschDevice) {
+      console.log(`✅ Znaleziono urządzenie Bosch: ${boschDevice.port}`);
+    } else {
+      console.log('❌ Nie znaleziono urządzenia Bosch');
+    }
+    
+    return boschDevice || null;
+  }
+
+  /**
+   * Sprawdź czy to urządzenie Bosch
    */
   private static isBoschDevice(port: any): boolean {
     const vendorId = port.vendorId?.toLowerCase();
     const productId = port.productId?.toLowerCase();
-    const manufacturer = port.manufacturer?.toLowerCase() || '';
+    const manufacturer = (port.manufacturer || '').toLowerCase();
 
-    return (
-      manufacturer.includes('bosch') ||
-      this.BOSCH_VENDORS.some(vid => vendorId?.includes(vid.toLowerCase())) ||
-      this.BOSCH_PRODUCTS.some(pid => productId?.includes(pid.toLowerCase()))
-    );
-  }
-
-  /**
-   * Znajdź Bosch Performance Line
-   */
-  static async findBoschDevice(): Promise<DetectedDevice | null> {
-    const devices = await this.scanPorts();
-    const boschDevice = devices.find(d => d.isBosch);
-
-    if (boschDevice) {
-      console.log(`✅ Znaleziono urządzenie Bosch:`);
-      console.log(`   Port: ${boschDevice.port}`);
-      console.log(`   Producent: ${boschDevice.manufacturer}`);
-      console.log(`   Numer seryjny: ${boschDevice.serialNumber}`);
-      return boschDevice;
-    } else {
-      console.log('❌ Brak urządzenia Bosch');
-      return null;
+    // Sprawdź VID/PID Bosch
+    if (vendorId === this.BOSCH_VENDOR_ID.toLowerCase()) {
+      return this.BOSCH_PRODUCT_IDS.some(
+        (pid) => pid.toLowerCase() === productId
+      );
     }
+
+    // Sprawdź nazwę producenta
+    if (manufacturer.includes('bosch')) {
+      return true;
+    }
+
+    return false;
   }
 
   /**
-   * Wyświetl wszystkie dostępne urządzenia
+   * Monitoruj zmiany portów (podłączenie/odpłączenie)
    */
-  static async listAllDevices(): Promise<void> {
-    const devices = await this.scanPorts();
+  static watchPorts(
+    onConnected: (device: DetectedDevice) => void,
+    onDisconnected: (device: DetectedDevice) => void
+  ): NodeJS.Timeout {
+    let previousDevices: DetectedDevice[] = [];
 
-    if (devices.length === 0) {
-      console.log('❌ Brak dostępnych urządzeń USB');
+    return setInterval(async () => {
+      const currentDevices = await this.listAvailablePorts();
+
+      // Nowe urządzenia
+      currentDevices.forEach((device) => {
+        if (!previousDevices.find((d) => d.port === device.port) && device.isBosch) {
+          onConnected(device);
+        }
+      });
+
+      // Odłączone urządzenia
+      previousDevices.forEach((device) => {
+        if (!currentDevices.find((d) => d.port === device.port) && device.isBosch) {
+          onDisconnected(device);
+        }
+      });
+
+      previousDevices = currentDevices;
+    }, 1000); // Sprawdzaj co sekundę
+  }
+
+  /**
+   * Zaloguj informacje o portach (debug)
+   */
+  static async debugPorts(): Promise<void> {
+    console.log('\n📱 === DOSTĘPNE PORTY SZEREGOWE ===\n');
+    
+    const ports = await SerialPort.list();
+    
+    if (ports.length === 0) {
+      console.log('❌ Brak wykrytych portów!\n');
       return;
     }
 
-    console.log('\n📱 Dostępne urządzenia USB:\n');
-    devices.forEach((device, index) => {
-      const boschLabel = device.isBosch ? '✅ [BOSCH]' : '   ';
-      console.log(`${index + 1}. ${boschLabel} ${device.port}`);
-      console.log(`   Producent: ${device.manufacturer}`);
-      console.log(`   Seria: ${device.serialNumber}`);
-      console.log(`   Vendor ID: ${device.vendorId}`);
-      console.log(`   Product ID: ${device.productId}`);
-      console.log();
+    ports.forEach((port, index) => {
+      console.log(`Port ${index + 1}:`);
+      console.log(`  Ścieżka: ${port.path}`);
+      console.log(`  Producent: ${port.manufacturer || 'Unknown'}`);
+      console.log(`  Vendor ID: ${port.vendorId || 'Unknown'}`);
+      console.log(`  Product ID: ${port.productId || 'Unknown'}`);
+      console.log(`  Serial: ${port.serialNumber || 'Unknown'}`);
+      
+      const isBosch = this.isBoschDevice(port);
+      console.log(`  Bosch: ${isBosch ? '✅ TAK' : '❌ NIE'}\n`);
     });
-  }
-
-  /**
-   * Testuj połączenie z portem
-   */
-  static async testConnection(portPath: string): Promise<boolean> {
-    try {
-      const port = new SerialPort({
-        path: portPath,
-        baudRate: 9600,
-        dataBits: 8,
-        stopBits: 1,
-        parity: 'none',
-      });
-
-      return new Promise((resolve) => {
-        const timeout = setTimeout(() => {
-          port.close();
-          resolve(false);
-        }, 3000);
-
-        port.on('open', () => {
-          clearTimeout(timeout);
-          console.log(`✅ Połączenie z ${portPath} udane!`);
-          port.close();
-          resolve(true);
-        });
-
-        port.on('error', (error) => {
-          clearTimeout(timeout);
-          console.error(`❌ Błąd połączenia: ${error.message}`);
-          resolve(false);
-        });
-      });
-    } catch (error) {
-      console.error(`❌ Błąd: ${error}`);
-      return false;
-    }
   }
 }
