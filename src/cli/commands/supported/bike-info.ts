@@ -52,6 +52,16 @@ export const bikeInfoCommand: CommandModule<unknown, BikeInfoCommandArgv> = {
         return;
       }
 
+      if (argv.components) {
+        bikeDb.showComponents('cube-stereo-140-2023');
+        return;
+      }
+
+      if (argv.compatibility) {
+        bikeDb.showCompatibility('cube-stereo-140-2023');
+        return;
+      }
+
       // Default
       bikeDb.showBikeInfo('cube-stereo-140-2023');
     } catch (error) {

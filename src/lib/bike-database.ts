@@ -123,4 +123,38 @@ export class BikeDatabase {
     });
     console.log();
   }
+
+  /**
+   * Pokaż komponenty
+   */
+  showComponents(bikeId: string): void {
+    const specs = this.getBikeSpecs(bikeId);
+    if (!specs) {
+      console.log('\n❌ Rower nie znaleziony\n');
+      return;
+    }
+
+    console.log(`\n⚙️ Komponenty ${specs.brand} ${specs.model}\n`);
+    Object.entries(specs.components).forEach(([key, value]) => {
+      console.log(`${key}: ${value}`);
+    });
+    console.log();
+  }
+
+  /**
+   * Pokaż kompatybilność
+   */
+  showCompatibility(bikeId: string): void {
+    const specs = this.getBikeSpecs(bikeId);
+    if (!specs) {
+      console.log('\n❌ Rower nie znaleziony\n');
+      return;
+    }
+
+    console.log(`\n🔄 Kompatybilność ${specs.brand} ${specs.model}\n`);
+    console.log(`Motory: ${specs.compatibility.motors.join(', ')}`);
+    console.log(`Baterie: ${specs.compatibility.batteries.join(', ')}`);
+    console.log(`Kontrolery: ${specs.compatibility.controllers.join(', ')}`);
+    console.log();
+  }
 }
