@@ -1,6 +1,6 @@
 import { CommandModule } from 'yargs';
-import { TuningProfiles } from '../../../lib/tuning-profiles';
-import { SystemIntegration } from '../../../lib/integration';
+import { TuningProfiles } from '../../lib/tuning-profiles';
+import { SystemIntegration } from '../../lib/integration';
 
 const tuningProfiles = new TuningProfiles();
 const systemIntegration = new SystemIntegration();

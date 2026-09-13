@@ -3,7 +3,7 @@
  * Zaawansowany silnik predykcji oparty na AI
  */
 
-import { Prediction } from './ml-models';
+import { MLModels, Prediction } from './ml-models';
 
 export interface ContextData {
   currentBattery: number;
@@ -24,10 +24,12 @@ export interface AIRecommendation {
 }
 
 export class AIPredictior {
+  private mlModels: MLModels;
   private contextHistory: ContextData[] = [];
   private maxHistory: number = 500;
 
   constructor() {
+    this.mlModels = new MLModels();
     console.log('🤖 AI Predictor zainicjalizowany\n');
   }
 

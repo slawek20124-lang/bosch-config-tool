@@ -1,11 +1,13 @@
 import { CommandModule } from 'yargs';
-import { SmartSystemCore } from '../../../lib/smart-system-core';
-import { MLModels } from '../../../lib/ml-models';
-import { AIPredictior } from '../../../lib/ai-predictor';
+import { SmartSystemCore } from '../../lib/smart-system-core';
+import { MLModels } from '../../lib/ml-models';
+import { AIPredictior } from '../../lib/ai-predictor';
+import { DataProcessor } from '../../lib/data-processor';
 
 const smartCore = new SmartSystemCore();
 const mlModels = new MLModels();
 const aiPredictor = new AIPredictior();
+const dataProcessor = new DataProcessor();
 
 interface SmartSystemCommandArgv {
   analyze?: boolean;

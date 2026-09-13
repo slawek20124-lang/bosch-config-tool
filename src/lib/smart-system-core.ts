@@ -37,6 +37,7 @@ export class SmartSystemCore {
   private rideHistory: RideData[][] = [];
   private rideAnalysisCache: RideAnalysis[] = [];
   private maxHistorySize: number = 100;
+  private isAnalyzing: boolean = false;
 
   constructor() {
     console.log('\n🧠 Inicjalizacja Smart System Core...');
@@ -46,6 +47,8 @@ export class SmartSystemCore {
    * Zaanalizu​j przejazd
    */
   analyzeRide(rideData: RideData[]): RideAnalysis {
+    this.isAnalyzing = true;
+
     if (rideData.length === 0) {
       throw new Error('Brak danych przejazdu');
     }
@@ -104,6 +107,7 @@ export class SmartSystemCore {
       this.rideAnalysisCache.shift();
     }
 
+    this.isAnalyzing = false;
     return analysis;
   }
 
