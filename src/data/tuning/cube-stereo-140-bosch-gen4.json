@@ -1,0 +1,33 @@
+{
+  "bikeModel": "cube-stereo-140-2023",
+  "motorType": "PERFORMANCE_CX_GEN4",
+  "batteryCapacity": 625,
+  "tuningProfile": "SPORT",
+  "smartSystemEnabled": true,
+  "motorSettings": {
+    "powerCurve": "AGGRESSIVE",
+    "maxAssist": 150,
+    "torqueFactor": 1.1,
+    "speedLimit": 25,
+    "temperatureLimit": 60
+  },
+  "smartSystemSettings": {
+    "aiOptimization": true,
+    "predictiveMode": true,
+    "terrainDetection": true,
+    "thermalManagement": true,
+    "energyRecovery": true,
+    "adaptivePowerCurve": true
+  },
+  "performanceTargets": {
+    "maxSpeed": 25,
+    "targetRange": 80,
+    "targetEfficiency": 1.2
+  },
+  "maintenanceSchedule": {
+    "suspension": "Every 100 hours",
+    "drivetrain": "Every 50 hours",
+    "brakes": "Every 200 hours",
+    "battery": "Every 500 cycles"
+  }
+}
