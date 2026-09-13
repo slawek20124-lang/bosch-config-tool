@@ -4,7 +4,7 @@
   "description": "Bosch eBike Configuration Tool - Offline Ready",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
+    "build": "tsc",
     "start": "node dist/cli/index.js",
     "cli": "ts-node src/cli/index.ts",
     "dev": "ts-node src/cli/index.ts",

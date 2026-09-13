@@ -1,5 +1,5 @@
 import { CommandModule } from 'yargs';
-import { BikeDatabase } from '../../../lib/bike-database';
+import { BikeDatabase } from '../../lib/bike-database';
 
 const bikeDb = new BikeDatabase();
 
@@ -49,16 +49,6 @@ export const bikeInfoCommand: CommandModule<unknown, BikeInfoCommandArgv> = {
 
       if (argv.geometry) {
         bikeDb.showGeometry('cube-stereo-140-2023');
-        return;
-      }
-
-      if (argv.components) {
-        bikeDb.showComponents('cube-stereo-140-2023');
-        return;
-      }
-
-      if (argv.compatibility) {
-        bikeDb.showCompatibility('cube-stereo-140-2023');
         return;
       }
 

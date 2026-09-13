@@ -5,6 +5,7 @@
 
 import { BikeDatabase } from './bike-database';
 import { TuningProfiles } from './tuning-profiles';
+import { SmartSystemCore } from './smart-system-core';
 
 export interface BikeSystemConfig {
   bikeModel: string;
@@ -17,11 +18,13 @@ export interface BikeSystemConfig {
 export class SystemIntegration {
   private bikeDb: BikeDatabase;
   private tuningProfiles: TuningProfiles;
+  private smartSystem: SmartSystemCore;
   private config: BikeSystemConfig | null = null;
 
   constructor() {
     this.bikeDb = new BikeDatabase();
     this.tuningProfiles = new TuningProfiles();
+    this.smartSystem = new SmartSystemCore();
   }
 
   /**

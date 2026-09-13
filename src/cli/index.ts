@@ -1,8 +1,8 @@
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
-import { smartSystemCommand } from './commands/supported/smart-system';
-import { bikeInfoCommand } from './commands/supported/bike-info';
-import { tuningCommand } from './commands/supported/tuning';
+import { smartSystemCommand } from './commands/smart-system';
+import { bikeInfoCommand } from './commands/bike-info';
+import { tuningCommand } from './commands/tuning';
 
 const main = async () => {
   await yargs(hideBin(process.argv))
