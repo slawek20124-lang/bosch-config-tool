@@ -24,10 +24,10 @@ declare module 'serialport' {
     readonly isOpen: boolean;
     open(callback?: (error?: Error | null) => void): void;
     close(callback?: (error?: Error | null) => void): void;
-    write(data: string, callback?: (error?: Error | null) => void): void;
+    write(data: string | Uint8Array, callback?: (error?: Error | null) => void): void;
     on(event: string, listener: (...args: any[]) => void): this;
     once(event: string, listener: (...args: any[]) => void): this;
-    pipe<T>(destination: T): T;
+    pipe<T extends NodeJS.WritableStream>(destination: T): T;
   }
 }
 
@@ -36,8 +36,14 @@ declare module '@serialport/parser-readline' {
     delimiter?: string;
   }
 
-  export class ReadlineParser {
+  export class ReadlineParser implements NodeJS.WritableStream {
     constructor(options?: ReadlineParserOptions);
+    writable: boolean;
+    write(buffer: Uint8Array | string, cb?: (error: Error | null | undefined) => void): boolean;
+    write(str: string, encoding?: BufferEncoding, cb?: (error: Error | null | undefined) => void): boolean;
+    end(cb?: () => void): this;
+    end(data: string | Uint8Array, cb?: () => void): this;
+    end(str: string, encoding?: BufferEncoding, cb?: () => void): this;
     on(event: string, listener: (...args: any[]) => void): this;
     once(event: string, listener: (...args: any[]) => void): this;
   }

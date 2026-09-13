@@ -31,7 +31,6 @@ export interface BikeProfile {
 
 export class BikeDatabase {
   private bikes: Map<string, BikeSpecs> = new Map();
-  private profiles: Map<string, BikeProfile> = new Map();
 
   constructor() {
     this.initializeBikes();

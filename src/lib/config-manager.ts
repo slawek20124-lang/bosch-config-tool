@@ -11,9 +11,16 @@ export interface AppConfig {
   lastSync: Date;
 }
 
+const createDefaultConfig = (): AppConfig => ({
+  motorType: 'PERFORMANCE_CX_GEN4',
+  smartSystemEnabled: false,
+  userPreferences: {},
+  lastSync: new Date(),
+});
+
 export class ConfigManager {
   private storage: OfflineStorage;
-  private config!: AppConfig;
+  private config: AppConfig = createDefaultConfig();
 
   constructor() {
     this.storage = new OfflineStorage();
@@ -25,13 +32,8 @@ export class ConfigManager {
    */
   private loadConfig(): void {
     const stored = this.storage.load('config');
-    
-    this.config = stored as AppConfig || {
-      motorType: 'PERFORMANCE_CX_GEN4',
-      smartSystemEnabled: false,
-      userPreferences: {},
-      lastSync: new Date(),
-    };
+
+    this.config = (stored as AppConfig) || createDefaultConfig();
   }
 
   /**
