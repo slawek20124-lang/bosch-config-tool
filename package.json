@@ -5,6 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
+    "package:install-zip": "bash create-install-zip.sh",
     "start": "node dist/cli/index.js",
     "cli": "ts-node src/cli/index.ts",
     "dev": "ts-node src/cli/index.ts",

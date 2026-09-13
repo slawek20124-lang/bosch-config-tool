@@ -34,6 +34,12 @@ npm run build
 npm start
 ```
 
+### Instalacyjny ZIP
+```bash
+npm run package:install-zip
+```
+Archiwum ZIP jest tworzone w: `release/bosch-config-tool-install-v<wersja>.zip`.
+
 ## 📚 Offline Features
 
 - 💾 Local data storage
