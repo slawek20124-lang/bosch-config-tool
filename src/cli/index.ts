@@ -1,12 +1,10 @@
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
-import { motorCommand } from './commands/motor';
-import { smartCommand } from './commands/smart';
+import { smartSystemCommand } from './commands/smart-system';
 
 const main = async () => {
   await yargs(hideBin(process.argv))
-    .command(motorCommand)
-    .command(smartCommand)
+    .command(smartSystemCommand)
     .demandCommand()
     .strict()
     .help()
