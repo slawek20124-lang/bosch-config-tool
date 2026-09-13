@@ -1,7 +1,7 @@
 import { CommandModule } from 'yargs';
-import { SmartSystemCore } from '../../lib/smart-system-core';
-import { MLModels } from '../../lib/ml-models';
-import { AIPredictior } from '../../lib/ai-predictor';
+import { SmartSystemCore } from '../../../lib/smart-system-core';
+import { MLModels } from '../../../lib/ml-models';
+import { AIPredictior } from '../../../lib/ai-predictor';
 
 const smartCore = new SmartSystemCore();
 const mlModels = new MLModels();

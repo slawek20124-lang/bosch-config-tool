@@ -1,5 +1,5 @@
 import { CommandModule } from 'yargs';
-import { BikeDatabase } from '../../lib/bike-database';
+import { BikeDatabase } from '../../../lib/bike-database';
 
 const bikeDb = new BikeDatabase();
 
