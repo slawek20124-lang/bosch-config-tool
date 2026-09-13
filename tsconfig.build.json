@@ -1,9 +1,22 @@
 {
   "extends": "./tsconfig.json",
-  "include": [
-    "src/cli/index.ts",
-    "src/cli/commands/bike-info.ts",
-    "src/cli/commands/smart-system.ts",
-    "src/cli/commands/tuning.ts"
+  "include": ["src/cli/**/*"],
+  "exclude": [
+    "src/cli/commands/assist.ts",
+    "src/cli/commands/bluetooth.ts",
+    "src/cli/commands/dashboard.ts",
+    "src/cli/commands/detect.ts",
+    "src/cli/commands/diagnostics.ts",
+    "src/cli/commands/export.ts",
+    "src/cli/commands/import.ts",
+    "src/cli/commands/motor.ts",
+    "src/cli/commands/profile.ts",
+    "src/cli/commands/read.ts",
+    "src/cli/commands/remote.ts",
+    "src/cli/commands/security.ts",
+    "src/cli/commands/smart.ts",
+    "src/cli/commands/speed.ts",
+    "src/cli/commands/update.ts",
+    "src/cli/commands/write.ts"
   ]
 }
