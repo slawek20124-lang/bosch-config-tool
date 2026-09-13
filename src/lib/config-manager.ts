@@ -13,7 +13,7 @@ export interface AppConfig {
 
 export class ConfigManager {
   private storage: OfflineStorage;
-  private config: AppConfig;
+  private config!: AppConfig;
 
   constructor() {
     this.storage = new OfflineStorage();

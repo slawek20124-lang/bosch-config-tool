@@ -52,6 +52,13 @@ export class USBDetector {
       console.error(`❌ Błąd podczas listy portów: ${error}`);
       return [];
     }
+
+    /**
+     * Zachowaj kompatybilność z istniejącą komendą CLI
+     */
+    static async listAllDevices(): Promise<void> {
+      await this.debugPorts();
+    }
   }
 
   /**
@@ -109,6 +116,33 @@ export class USBDetector {
       currentDevices.forEach((device) => {
         if (!previousDevices.find((d) => d.port === device.port) && device.isBosch) {
           onConnected(device);
+        }
+
+        /**
+         * Sprawdź czy port można otworzyć
+         */
+        static async testConnection(devicePath: string): Promise<boolean> {
+          try {
+            const port = new SerialPort({
+              path: devicePath,
+              baudRate: 9600,
+              autoOpen: false,
+            });
+
+            return await new Promise((resolve) => {
+              port.open((error?: Error | null) => {
+                if (error) {
+                  resolve(false);
+                  return;
+                }
+
+                port.close(() => resolve(true));
+              });
+            });
+          } catch (error) {
+            console.error(`❌ Błąd testu połączenia: ${error}`);
+            return false;
+          }
         }
       });
 
