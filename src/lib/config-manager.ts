@@ -31,9 +31,13 @@ export class ConfigManager {
    * Load configuration
    */
   private loadConfig(): void {
-    const stored = this.storage.load('config');
+    const stored = this.storage.load('config') as Partial<AppConfig> | null;
 
-    this.config = (stored as AppConfig) || createDefaultConfig();
+    this.config = {
+      ...createDefaultConfig(),
+      ...stored,
+      lastSync: stored?.lastSync ? new Date(stored.lastSync) : new Date(),
+    };
   }
 
   /**

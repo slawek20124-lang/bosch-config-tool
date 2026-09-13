@@ -22,6 +22,16 @@
     "noFallthroughCasesInSwitch": true,
     "moduleResolution": "node"
   },
-  "files": ["src/cli/index.ts", "src/types/serialport.d.ts"],
-  "exclude": ["node_modules", "dist", "**/*.test.ts", "src/electron/**/*"]
+  "include": [
+    "src/cli/index.ts",
+    "src/cli/commands/bike-info.ts",
+    "src/cli/commands/smart-system.ts",
+    "src/cli/commands/tuning.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "**/*.test.ts",
+    "src/electron/**/*"
+  ]
 }
