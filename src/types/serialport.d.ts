@@ -25,8 +25,8 @@ declare module 'serialport' {
     open(callback?: (error?: Error | null) => void): void;
     close(callback?: (error?: Error | null) => void): void;
     write(data: string, callback?: (error?: Error | null) => void): void;
-    on(event: string, listener: (...args: unknown[]) => void): this;
-    once(event: string, listener: (...args: unknown[]) => void): this;
+    on(event: string, listener: (...args: any[]) => void): this;
+    once(event: string, listener: (...args: any[]) => void): this;
     pipe<T>(destination: T): T;
   }
 }
@@ -38,7 +38,7 @@ declare module '@serialport/parser-readline' {
 
   export class ReadlineParser {
     constructor(options?: ReadlineParserOptions);
-    on(event: string, listener: (...args: unknown[]) => void): this;
-    once(event: string, listener: (...args: unknown[]) => void): this;
+    on(event: string, listener: (...args: any[]) => void): this;
+    once(event: string, listener: (...args: any[]) => void): this;
   }
 }
