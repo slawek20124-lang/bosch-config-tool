@@ -1,0 +1,4 @@
+{
+  "extends": "./tsconfig.json",
+  "include": ["src/cli/index.ts", "src/cli/commands/supported/**/*.ts"]
+}
