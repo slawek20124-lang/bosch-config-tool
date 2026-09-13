@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "src/cli/index.ts",
+    "src/cli/commands/bike-info.ts",
+    "src/cli/commands/smart-system.ts",
+    "src/cli/commands/tuning.ts"
+  ]
+}

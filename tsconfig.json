@@ -22,27 +22,6 @@
     "noFallthroughCasesInSwitch": true,
     "moduleResolution": "node"
   },
-  "include": ["src/cli/**/*"],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "**/*.test.ts",
-    "src/electron/**/*",
-    "src/cli/commands/assist.ts",
-    "src/cli/commands/bluetooth.ts",
-    "src/cli/commands/dashboard.ts",
-    "src/cli/commands/detect.ts",
-    "src/cli/commands/diagnostics.ts",
-    "src/cli/commands/export.ts",
-    "src/cli/commands/import.ts",
-    "src/cli/commands/motor.ts",
-    "src/cli/commands/profile.ts",
-    "src/cli/commands/read.ts",
-    "src/cli/commands/remote.ts",
-    "src/cli/commands/security.ts",
-    "src/cli/commands/smart.ts",
-    "src/cli/commands/speed.ts",
-    "src/cli/commands/update.ts",
-    "src/cli/commands/write.ts"
-  ]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "**/*.test.ts", "src/electron/**/*"]
 }
